@@ -32,6 +32,3 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/html-cicd:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/html-cicd:${{ env.IMAGE_TAG }}
-
-      - name: Output Docker Image Tags
-        run: echo "Docker images pushed: latest and ${{ env.IMAGE_TAG }}"
