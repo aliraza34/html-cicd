@@ -1,0 +1,41 @@
+name: Deploy to S3 using Terraform and OIDC
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::776705051324:role/s3-upload-create-role
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -auto-approve -var="bucket_ali=my-test-bucket-ali-1234567"
+
+      - name: Upload Repo Files to S3
+        run: |
+          BUCKET_NAME=$(terraform -chdir=terraform output -raw bucket_ali)
+          aws s3 cp . s3://$BUCKET_NAME/ --recursive --exclude ".git/*" --exclude "terraform/*"
