@@ -24,18 +24,18 @@ jobs:
           role-to-assume: arn:aws:iam::776705051324:role/s3-upload-create-role
           aws-region: us-east-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+     # - name: Setup Terraform
+      #  uses: hashicorp/setup-terraform@v2
 
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init
+     # - name: Terraform Init
+      #  working-directory: terraform
+       # run: terraform init
 
-      - name: Terraform Apply
-        working-directory: terraform
-        run: terraform apply -auto-approve -var="bucket_ali=my-test-bucket-ali-1234567"
+    # - name: Terraform Apply
+     #   working-directory: terraform
+      #  run: terraform apply -auto-approve -var="bucket_ali=my-test-bucket-ali-1234567"
 
       - name: Upload Repo Files to S3
         run: |
-          BUCKET_NAME=$(terraform -chdir=terraform output -raw bucket_ali)
+          BUCKET_NAME="my-test-bucket-ali-1234567"
           aws s3 cp . s3://$BUCKET_NAME/ --recursive --exclude ".git/*" --exclude "terraform/*"
